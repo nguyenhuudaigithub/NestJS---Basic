@@ -11,9 +11,6 @@ import { AuthModule } from './auth/auth.module';
     ConfigModule.forRoot({
       ignoreEnvFile: true,
     }),
-    // MongooseModule.forRoot(
-    //   'mongodb+srv://nestjs-basic:22sznT035YczR8LF@nestjs.dzqpmb2.mongodb.net/',
-    // ),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
