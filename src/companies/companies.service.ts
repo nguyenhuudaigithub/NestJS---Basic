@@ -30,12 +30,31 @@ export class CompaniesService {
     return this.companyModel.findOne({ _id: id });
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id)) return 'Not found company !';
+    return this.companyModel.updateOne(
+      {
+        _id: id,
+      },
+      {
+        ...updateCompanyDto,
+        updateBy: { _id: user._id, email: user.email },
+      },
+    );
   }
 
-  async remove(id: number) {
+  async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) return 'Not found company !';
-    return await this.companyModel.softDelete({ _id: id });
+
+    await this.companyModel.updateOne(
+      {
+        _id: id,
+      },
+      {
+        deletecBy: { _id: user._id, email: user.email },
+      },
+    );
+
+    return this.companyModel.softDelete({ _id: id });
   }
 }
