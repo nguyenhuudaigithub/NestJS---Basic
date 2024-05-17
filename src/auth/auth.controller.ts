@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { Public } from 'src/decorator/customize';
+import { Public, ResponseMessage } from 'src/decorator/customize';
+import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,14 +17,22 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
+  @ResponseMessage('Đăng nhập thành công !')
   @Post('/login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
-  // @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @ResponseMessage('Thông tin cá nhân !')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Public()
+  @Post('register')
+  @ResponseMessage('Đăng ký thành công tài khoản mới !')
+  register(@Body() registerUserDto: RegisterUserDto) {
+    return this.authService.register(registerUserDto);
   }
 }
