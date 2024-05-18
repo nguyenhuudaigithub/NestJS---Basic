@@ -44,4 +44,15 @@ export class AuthController {
   handleGetAccount(@User() user: IUser) {
     return { user };
   }
+
+  @Public()
+  @Get('/refresh')
+  @ResponseMessage('Lấy thông tin người dùng bằng refresh token thành công !')
+  handleRefreshToken(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const refreshToken = request.cookies['refresh_token'];
+    return this.authService.processNewToken(refreshToken, response);
+  }
 }
