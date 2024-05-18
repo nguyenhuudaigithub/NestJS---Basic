@@ -6,6 +6,7 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { genSaltSync, hashSync } from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: IUser) {
+  async login(user: IUser, response: Response) {
     const { _id, name, email, role } = user;
     const payload = {
       sub: 'token login',
@@ -40,6 +41,15 @@ export class AuthService {
     };
 
     const refreshToken = this.createRefreshToken(payload);
+
+    // update refresh token
+    await this.usersService.updateUserTOken(refreshToken, _id);
+
+    //set refresh token as cookies
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE')),
+    });
 
     return {
       access_token: this.jwtService.sign(payload),
