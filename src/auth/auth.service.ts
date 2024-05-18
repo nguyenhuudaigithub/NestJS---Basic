@@ -138,4 +138,10 @@ export class AuthService {
       );
     }
   };
+
+  logout = async (response: Response, user: IUser) => {
+    await this.usersService.updateUserTOken('', user._id);
+    response.clearCookie('refresh_token');
+    return 'Đăng xuất thành công.';
+  };
 }
