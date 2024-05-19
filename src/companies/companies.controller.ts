@@ -19,12 +19,13 @@ export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
   @Post()
+  @ResponseMessage('Tạo mới công ty thành công !')
   create(@Body() createCompanyDto: CreateCompanyDto, @User() user: IUser) {
     return this.companiesService.create(createCompanyDto, user);
   }
 
   @Get()
-  @ResponseMessage('Fetch list of companies')
+  @ResponseMessage('Lấy ra danh sách công ty thành công!')
   findAll(
     @Query('current') currentPage: string,
     @Query('pageSize') limit: string,
@@ -34,11 +35,13 @@ export class CompaniesController {
   }
 
   @Get(':id')
+  @ResponseMessage('Lấy ra công ty thành công!')
   findOne(@Param('id') id: string) {
-    return this.companiesService.findOne(+id);
+    return this.companiesService.findOne(id);
   }
 
   @Patch(':id')
+  @ResponseMessage('Cập nhập công ty thành công!')
   update(
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDto,
@@ -48,6 +51,7 @@ export class CompaniesController {
   }
 
   @Delete(':id')
+  @ResponseMessage('Xóa công ty thành công!')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.companiesService.remove(id, user);
   }
