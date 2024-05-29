@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -54,13 +54,15 @@ export class CompaniesService {
     };
   }
 
-  findOne(id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'Không tìm thấy công ty !';
-    return this.companyModel.findOne({ _id: id });
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`Không tìm thấy công ty ! với ${id}`);
+    return await this.companyModel.findOne({ _id: id });
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'Không tìm thấy công ty !';
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`Không tìm thấy công ty ! với ${id}`);
     return this.companyModel.updateOne(
       {
         _id: id,
@@ -73,7 +75,8 @@ export class CompaniesService {
   }
 
   async remove(id: string, user: IUser) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'Không tìm thấy công ty !';
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`Không tìm thấy công ty ! với ${id}`);
 
     await this.companyModel.updateOne(
       {
