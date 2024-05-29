@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { Job, JobDocument } from './schemas/job.schemas';
@@ -79,12 +79,13 @@ export class JobsService {
 
   findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id))
-      return 'Không tìm thấy công việc !';
+      throw new BadRequestException(`Không tìm thấy công việc ! với ${id}`);
     return this.jobModel.findOne({ _id: id });
   }
 
   async update(id: string, updateJobDto: UpdateJobDto, user: IUser) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'Không tìm thấy công ty !';
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`Không tìm thấy công việc ! với ${id}`);
     return this.jobModel.updateOne(
       {
         _id: id,
@@ -97,7 +98,8 @@ export class JobsService {
   }
 
   async remove(id: string, user: IUser) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'Không tìm thấy công ty !';
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`Không tìm thấy công việc ! với ${id}`);
 
     await this.jobModel.updateOne(
       {

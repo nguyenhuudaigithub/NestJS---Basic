@@ -1,34 +1,64 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ResumesService } from './resumes.service';
-import { CreateResumeDto } from './dto/create-resume.dto';
+import { CreateResumeDto, CreateUserCvDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
+import { ResponseMessage, User } from 'src/decorator/customize';
+import { IUser } from 'src/users/users.interface';
 
 @Controller('resumes')
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) {}
 
   @Post()
-  create(@Body() createResumeDto: CreateResumeDto) {
-    return this.resumesService.create(createResumeDto);
+  @ResponseMessage('Thêm mới CV thành công!')
+  create(@Body() createUserCvDto: CreateUserCvDto, @User() user: IUser) {
+    return this.resumesService.create(createUserCvDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.resumesService.findAll();
+  @ResponseMessage('Lấy ra danh sách CV thành công!')
+  findAll(
+    @Query('current') currentPage: string,
+    @Query('pageSize') limit: string,
+    @Query() qs: string,
+  ) {
+    return this.resumesService.findAll(+currentPage, +limit, qs);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.resumesService.findOne(+id);
+  @ResponseMessage('Lấy ra CV thành công!')
+  findOne(@Param('id') _id: string) {
+    return this.resumesService.findOne(_id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateResumeDto: UpdateResumeDto) {
-    return this.resumesService.update(+id, updateResumeDto);
+  @ResponseMessage('Cập nhập trạng thái CV thành công!')
+  updateStatus(
+    @Param('id') _id: string,
+    @Body('status') status: string,
+    @User() user: IUser,
+  ) {
+    return this.resumesService.update(_id, status, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resumesService.remove(+id);
+  @ResponseMessage('Xóa trạng thái CV thành công!')
+  remove(@Param('id') _id: string, @User() user: IUser) {
+    return this.resumesService.remove(_id, user);
+  }
+
+  @Post('by-user')
+  @ResponseMessage('Lấy ra CV thành công!')
+  getResumesByUser(@User() user: IUser) {
+    return this.resumesService.findByUsers(user);
   }
 }
