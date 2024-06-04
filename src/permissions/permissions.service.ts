@@ -86,8 +86,18 @@ export class PermissionsService {
     updatePermissionDto: UpdatePermissionDto,
     user: IUser,
   ) {
+    // const { apiPath, method } = updatePermissionDto;
+
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new BadRequestException(`Không tìm thấy phân quyền ! với ${id}`);
+
+    // const isExits = await this.permissionsModel.findOne({ apiPath, method });
+
+    // if (isExits) {
+    //   throw new BadRequestException(
+    //     `Quyền hạn với ${apiPath} và ${method} đã tồn tại !`,
+    //   );
+    // }
 
     return await this.permissionsModel.updateOne(
       {
