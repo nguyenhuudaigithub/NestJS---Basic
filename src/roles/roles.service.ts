@@ -78,21 +78,13 @@ export class RolesService {
       throw new BadRequestException(`Không tìm thấy vai trò ! với ${id}`);
     return (await this.roleModel.findOne({ _id: id })).populate({
       path: 'permissions',
-      select: { _id: 1, name: 1, method: 1 },
+      select: { _id: 1, name: 1, method: 1, module: 1 },
     });
   }
 
   async update(id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
-    // const { name } = updateRoleDto;
-
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new BadRequestException(`Không tìm thấy  vai trò ! với ${id}`);
-
-    // const isExits = await this.roleModel.findOne({ name });
-
-    // if (isExits) {
-    //   throw new BadRequestException(`Tên ${name} đã tồn tại !`);
-    // }
 
     return await this.roleModel.updateOne(
       {
@@ -108,6 +100,12 @@ export class RolesService {
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new BadRequestException(`Không tìm thấy  vai trò ! với ${id}`);
+
+    const foundUser = await this.roleModel.findById({ id });
+
+    if (foundUser.name === 'ADMIN') {
+      throw new BadRequestException('Không thể xóa vai trò ADMIN!');
+    }
 
     await this.roleModel.updateOne(
       {
