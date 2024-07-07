@@ -1,3 +1,4 @@
+import { USER_ROLE } from './../databases/sample';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,10 +10,13 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
 import { User } from 'src/decorator/customize';
 import aqp from 'api-query-params';
+import { Role, RoleDocument } from 'src/roles/schema/role.schema';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(UserM.name) private userModel: SoftDeleteModel<UserDocument>,
+
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
   ) {}
 
   gethashPassword = (password: string) => {
@@ -97,7 +101,7 @@ export class UsersService {
   findOneByUsername(username: string) {
     return this.userModel.findOne({ email: username }).populate({
       path: 'role',
-      select: { name: 1, permissions: 1 },
+      select: { name: 1 },
     });
   }
 
@@ -157,6 +161,8 @@ export class UsersService {
       );
     }
 
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
     let newRegisterUser = await this.userModel.create({
       name,
       email,
@@ -164,7 +170,7 @@ export class UsersService {
       age,
       gender,
       address,
-      role: 'USER',
+      role: userRole?._id,
     });
     return newRegisterUser;
   }
