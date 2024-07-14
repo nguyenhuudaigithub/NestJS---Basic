@@ -1,10 +1,12 @@
 import {
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/decorator/customize';
 
 @Injectable()
@@ -33,6 +35,21 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           'Token không hợp lệ hoặc không có token ở Bearer Token ở Header request!',
         )
       );
+    }
+
+    // check permissions
+    const targetMethod = request.method;
+    const targetEndpoint = request.route.endpoint;
+
+    const permissions = user?.permissions ?? [];
+    const isExist = permissions.find(
+      (permissions) =>
+        targetMethod === permissions.method &&
+        targetEndpoint === permissions.apiPath,
+    );
+
+    if (!isExist) {
+      throw new ForbiddenException('Bạn không có quyền truy cập endpoin này!');
     }
     return user;
   }
