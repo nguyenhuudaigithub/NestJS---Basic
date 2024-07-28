@@ -79,23 +79,16 @@ export class SubscribersService {
     return await this.SubscribersModel.findOne({ _id: id });
   }
 
-  async update(
-    id: string,
-    UpdateSubscriberDto: UpdateSubscriberDto,
-    user: IUser,
-  ) {
-    if (!mongoose.Types.ObjectId.isValid(id))
-      throw new BadRequestException(`Không tìm thấy phân quyền ! với ${id}`);
-
-    return await this.SubscribersModel.updateOne(
-      {
-        _id: id,
-      },
+  async update(UpdateSubscriberDto: UpdateSubscriberDto, user: IUser) {
+    const updated = await this.SubscribersModel.updateOne(
+      { email: user.email },
       {
         ...UpdateSubscriberDto,
         updateBy: { _id: user._id, email: user.email },
       },
+      { upsert: true },
     );
+    return updated;
   }
 
   async remove(id: string, user: IUser) {
@@ -112,5 +105,10 @@ export class SubscribersService {
     );
 
     return this.SubscribersModel.softDelete({ _id: id });
+  }
+
+  async getSkills(user: IUser) {
+    const { email } = user;
+    return await this.SubscribersModel.findOne({ email }, { skills: 1 });
   }
 }
