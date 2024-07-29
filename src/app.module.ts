@@ -15,11 +15,16 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { DatabasesModule } from './databases/databases.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { MailModule } from './mail/mail.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       ignoreEnvFile: true,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60000,
+      limit: 10,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
