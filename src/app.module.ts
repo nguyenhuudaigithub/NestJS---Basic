@@ -23,10 +23,12 @@ import { HealthModule } from './health/health.module';
     ConfigModule.forRoot({
       ignoreEnvFile: true,
     }),
-    ThrottlerModule.forRoot({
-      ttl: 60000,
-      limit: 10,
-    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
